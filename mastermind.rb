@@ -37,14 +37,25 @@ class Human
 end
 
 class Game
-  human = Human.new
+
+    computer = Computer.new
+    human = Human.new
+
+    p computer.answer
+
   4.times do |x| 
     puts "What's your guess for position number #{x+1}?" 
     human.add(gets.chomp)
   end
+
   puts "Your current guess is: #{human.guess.join(', ')}"
-
-
+  
+  if human.guess == computer.answer
+    puts "YAY!"
+  else
+    puts "BOO!"
+  end
+  
 end
 
 
