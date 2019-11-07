@@ -3,7 +3,7 @@ class Board
     def colors
       @colors = ['red', 'blue', 'green', 'yellow', 'white', 'black']
     end
-    #doesn't work right now, but an idea
+    
     def rounds
         @ROUNDS = 12
     end
@@ -43,9 +43,9 @@ class Game
     human = Human.new
     round = 0
 
-   # p computer.answer
+    p computer.answer
 
-  while round < 12
+  while round < board.rounds
     #checks if you've won yet -- make method?
     if computer.answer == human.guess
         puts "You win!"
@@ -60,6 +60,8 @@ class Game
     color_counter = 0
     exact_counter = 0
     human.guess = []
+    comp_tally = Hash.new(0)
+    human_tally = Hash.new(0)
     #adds guesses into guess array
     4.times do |x| 
       puts "What's your guess for position number #{x+1}?" 
@@ -69,20 +71,28 @@ class Game
         temp = gets.chomp
       end
       human.add(temp)
-
+          
+    
     end
     #re-iterates guesses
     puts
     puts "Your current guess is: #{human.guess.join(', ')}"
     puts
     #checks how many of the colors are correct
-    y = 0
-    computer.answer.each_with_index do |x|
-      if x == human.guess[y]
-        color_counter +=1
-        y += 1
-      end
-    end
+    
+    computer.answer.each { |x| comp_tally[x] +=1 }
+    human.guess.each { |y| human_tally[y] += 1 }
+      comp_tally.each do |key, value|
+        if human_tally.include?(key)
+          if value > human_tally[key]
+            color_counter += human_tally[key]
+          else
+            color_counter += value
+          end
+        end
+
+        end
+    
 
     puts "You've got #{color_counter} correct guesses for the colors"
     #checks how many are exact matches
@@ -97,16 +107,6 @@ class Game
     round += 1
   end
 
-
-
-  def play_round
-
-  end
-
 end
 
-Game.new
-
-#works except it doesn't seem consistant. sometimes it will say a guess
-#has 2 right colors, then you move those 2 colors around and it says only
-#1 is right...
+#Game.new
