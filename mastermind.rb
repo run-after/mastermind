@@ -16,14 +16,15 @@ class Board
 
   class Player
     attr_accessor :guess
-
-    def initialize
-      @guess = []
-    end
   
-    def add(value)
+    def add_guess(value)
       @guess.push(value)
     end
+
+    def answer
+        @answer
+    end
+
   end
 
 class Computer < Player
@@ -35,15 +36,19 @@ class Computer < Player
     @guess = [board.colors[rand(board.size)], board.colors[rand(board.size)], 
     board.colors[rand(board.size)], board.colors[rand(board.size)]]
   end
-  
-  def answer
-    @answer
-  end
 
 end
 
 class Human < Player
-  
+
+  def initialize
+    @guess = []
+    @answer = []
+  end
+
+  def add_answer(value)
+    @answer.push(value)
+  end
 
 end
 
@@ -90,7 +95,7 @@ class Game
         puts "Sorry, that is not an option... Try again."
         temp = gets.chomp
       end
-      human.add(temp)
+      human.add_guess(temp)
     end
     #re-iterates guesses
     puts
@@ -122,11 +127,82 @@ class Game
     
     round += 1
   end
-elsif game_mode == 'create'
+  elsif game_mode == 'create'
 ################create mode####################
-    puts "coming soon"
-end
+    puts "Your color choices are #{board.colors.join(', ')}."
+    puts
+    #adds answer into answer array
+    4.times do |x| 
+       puts "Choose your color for position number #{x+1}?" 
+       temp = gets.chomp
+       until board.colors.include?(temp)
+         puts "Sorry, that is not an option... Try again."
+         temp = gets.chomp
+       end
+       human.add_answer(temp)
+     end
+     #re-iterates secret code
+     puts
+     puts "Your current code is: #{human.answer.join(', ')}"
+     puts
 
+    while round < board.rounds
+    #checks if computer has won yet -- make method?
+      if computer.guess == human.answer
+        puts "Computer wins!"
+        break
+      else
+        puts "Round #{round+1}, #{12 - (round+1)} left."
+      end
+      #resets the counters and computer guesses each iteration
+      color_counter = 0
+      exact_counter = 0
+      found_color = ''
+
+      comp_tally = Hash.new(0)
+      human_tally = Hash.new(0)
+
+      p computer.guess
+      #checks how many of the colors are correct
+      #creates a tally of both computer answer and player guess
+      computer.guess.each { |x| comp_tally[x] +=1 }
+      human.answer.each { |y| human_tally[y] += 1 }
+      #compares guesses to answer tallies
+      human_tally.each do |key, value|
+        if comp_tally.include?(key)
+          if value > comp_tally[key]
+            color_counter += comp_tally[key]
+          else
+            color_counter += value
+          end
+          found_color = key
+        end
+       end
+      puts "Computer got #{color_counter} correct guesses for the colors"
+      #checks how many are exact matches
+      4.times do |x|
+        if computer.guess[x] == human.answer[x]
+          exact_counter += 1
+          computer.guess[x] = computer.guess[x]
+        else
+          
+            computer.guess[x] = board.colors[rand(board.size)]
+          
+        end
+      end
+      puts "and #{exact_counter} in the right spot(s)."
+      puts
+    
+      round += 1
+    end
+    if round == board.rounds
+      puts "The computer failed to guess your code. Good job."
+    end
+  end
 end
 
 #Game.new
+
+#thinking about making a correct place/color uppercase to LOCK it in.
+#then I'd have to check if it's upcase or downcase to be able to assign 
+#it a random number
