@@ -70,7 +70,7 @@ class Game
     p computer.answer
 
   while round < board.rounds
-    #checks if you've won yet -- make method?
+    #checks if you've won yet
     if computer.answer == human.guess
         puts "You win!"
         break
@@ -147,7 +147,8 @@ class Game
      puts
 
     while round < board.rounds
-    #checks if computer has won yet -- make method?
+    #checks if computer has won yet
+    p computer.guess
       if computer.guess == human.answer
         puts "Computer wins!"
         break
@@ -157,12 +158,12 @@ class Game
       #resets the counters and computer guesses each iteration
       color_counter = 0
       exact_counter = 0
-      found_color = ''
+      found_color = board.colors[rand(board.size)]
 
       comp_tally = Hash.new(0)
       human_tally = Hash.new(0)
 
-      p computer.guess
+      
       #checks how many of the colors are correct
       #creates a tally of both computer answer and player guess
       computer.guess.each { |x| comp_tally[x] +=1 }
@@ -170,12 +171,15 @@ class Game
       #compares guesses to answer tallies
       human_tally.each do |key, value|
         if comp_tally.include?(key)
+          
           if value > comp_tally[key]
             color_counter += comp_tally[key]
+            found_color = key
           else
             color_counter += value
           end
-          found_color = key
+
+                              
         end
        end
       puts "Computer got #{color_counter} correct guesses for the colors"
@@ -185,9 +189,7 @@ class Game
           exact_counter += 1
           computer.guess[x] = computer.guess[x]
         else
-          
-            computer.guess[x] = board.colors[rand(board.size)]
-          
+            computer.guess[x] = found_color
         end
       end
       puts "and #{exact_counter} in the right spot(s)."
@@ -195,6 +197,7 @@ class Game
     
       round += 1
     end
+    
     if round == board.rounds
       puts "The computer failed to guess your code. Good job."
     end
